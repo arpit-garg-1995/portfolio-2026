@@ -1,0 +1,60 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const projects = [
+  {
+    title: 'Multi-Camera Recorder',
+    summary: 'A Swift app that coordinates front/back capture, recording controls, and low-latency previews.',
+    stack: ['Swift', 'AVFoundation', 'AVCaptureMultiCamSession'],
+    link: 'https://github.com/your-github/multi-cam-recorder'
+  },
+  {
+    title: 'Thermal & Pressure Monitor',
+    summary: 'An internal diagnostics tool for observing system pressure, thermal states, and safe fallback paths during recording.',
+    stack: ['Swift', 'AVCaptureSession', 'Performance'],
+    link: 'https://github.com/your-github/thermal-monitor'
+  },
+  {
+    title: 'MVVM + Coordinator Starter',
+    summary: 'A reusable architecture template for feature modules, navigation flow, and testable view models.',
+    stack: ['Swift', 'MVVM', 'Coordinator'],
+    link: 'https://github.com/your-github/ios-architecture-starter'
+  },
+  {
+    title: 'LeetCode Notes Repo',
+    summary: 'Patterns, shortcuts, and clean Swift solutions for interviews and daily practice.',
+    stack: ['Swift', 'Algorithms', 'DSA'],
+    link: 'https://github.com/your-github/leetcode-notes'
+  }
+];
+---
+
+<BaseLayout
+  title="Projects | Arpit Garg"
+  description="Selected iOS, architecture, and algorithm projects by Arpit Garg."
+  path="/projects/"
+>
+  <section class="section">
+    <div class="card">
+      <h1>Projects</h1>
+      <p>These cards are written like recruiter-friendly snapshots: problem, stack, and why the work matters.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="grid grid-2">
+      {projects.map((project) => (
+        <article class="project-card">
+          <h2>{project.title}</h2>
+          <p>{project.summary}</p>
+          <div class="pill-row">
+            {project.stack.map((item) => <span class="pill">{item}</span>)}
+          </div>
+          <p style="margin-top:1rem;">
+            <a class="btn btn-secondary" href={project.link} target="_blank" rel="noreferrer">Open Repo</a>
+          </p>
+        </article>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

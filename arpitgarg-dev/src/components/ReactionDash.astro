@@ -1,0 +1,93 @@
+<section class="card">
+  <div class="game-header">
+    <div>
+      <h2>Reaction Dash</h2>
+      <p class="game-note">Hit the glowing tile for 20 seconds. Best score is stored locally in your browser.</p>
+    </div>
+    <div class="pill mono" id="dash-best">Best 0</div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="small">Score</div><strong id="dash-score">0</strong></div>
+    <div class="stat"><div class="small">Time</div><strong id="dash-time">20</strong></div>
+    <div class="stat"><button class="btn btn-secondary" id="dash-start" type="button">Start</button></div>
+  </div>
+
+  <div class="dash-grid" id="dash-grid">
+    <button class="dash-cell" type="button" data-i="0">1</button>
+    <button class="dash-cell" type="button" data-i="1">2</button>
+    <button class="dash-cell" type="button" data-i="2">3</button>
+    <button class="dash-cell" type="button" data-i="3">4</button>
+    <button class="dash-cell" type="button" data-i="4">5</button>
+    <button class="dash-cell" type="button" data-i="5">6</button>
+    <button class="dash-cell" type="button" data-i="6">7</button>
+    <button class="dash-cell" type="button" data-i="7">8</button>
+    <button class="dash-cell" type="button" data-i="8">9</button>
+  </div>
+</section>
+
+<script is:inline>
+  const KEY = 'ag-reaction-best';
+  const bestEl = document.getElementById('dash-best');
+  const scoreEl = document.getElementById('dash-score');
+  const timeEl = document.getElementById('dash-time');
+  const startEl = document.getElementById('dash-start');
+  const cells = [...document.querySelectorAll('.dash-cell')];
+  let best = Number(localStorage.getItem(KEY) || 0);
+  let score = 0;
+  let time = 20;
+  let active = -1;
+  let timer = null;
+  let runner = null;
+
+  const paintBest = () => bestEl.textContent = `Best ${best}`;
+  const clearActive = () => cells.forEach((c) => c.classList.remove('active'));
+  const nextTarget = () => {
+    clearActive();
+    active = Math.floor(Math.random() * cells.length);
+    cells[active].classList.add('active');
+  };
+
+  const stop = () => {
+    clearInterval(timer);
+    clearInterval(runner);
+    timer = null;
+    runner = null;
+    clearActive();
+    if (score > best) {
+      best = score;
+      localStorage.setItem(KEY, String(best));
+      paintBest();
+    }
+    startEl.disabled = false;
+    startEl.textContent = 'Play Again';
+  };
+
+  startEl?.addEventListener('click', () => {
+    score = 0;
+    time = 20;
+    scoreEl.textContent = '0';
+    timeEl.textContent = '20';
+    startEl.disabled = true;
+    nextTarget();
+
+    runner = setInterval(nextTarget, 700);
+    timer = setInterval(() => {
+      time -= 1;
+      timeEl.textContent = String(time);
+      if (time <= 0) stop();
+    }, 1000);
+  });
+
+  cells.forEach((cell, idx) => {
+    cell.addEventListener('click', () => {
+      if (idx === active && timer) {
+        score += 1;
+        scoreEl.textContent = String(score);
+        nextTarget();
+      }
+    });
+  });
+
+  paintBest();
+</script>

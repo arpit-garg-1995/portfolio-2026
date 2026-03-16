@@ -1,0 +1,110 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('blog'))
+  .filter((post) => !post.data.draft)
+  .sort((a, b) => b.data.pubDate - a.data.pubDate)
+  .slice(0, 3);
+
+const skills = [
+  'Swift', 'iOS Video Pipelines', 'AVCaptureMultiCamSession',
+  'AVFoundation', 'MVVM + Coordinator', 'Thermal Management',
+  'Performance Tuning', 'LeetCode', 'System Design', 'GitHub Actions'
+];
+---
+
+<BaseLayout
+  title="Arpit Garg | Senior iOS Engineer"
+  description="Senior iOS Engineer from India building multi-cam apps, video systems, developer content, and playful browser experiments."
+  path="/"
+>
+  <section class="hero">
+    <div class="hero-grid">
+      <div class="card hero-copy">
+        <div class="eyebrow">Open to global roles · Germany-bound</div>
+        <h1>Senior iOS Engineer <span class="accent">building multi-cam magic</span></h1>
+        <p>
+          I build fast, stable, camera-heavy iOS products with Swift, AVFoundation, and clean architecture.
+          I care about low-latency capture, thermal safety, maintainable code, and shipping features that feel smooth on real devices.
+        </p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="/projects/">View Projects</a>
+          <a class="btn btn-secondary" href="/blog/">Read Blog</a>
+          <a class="btn btn-secondary" href="/games/">Play Games</a>
+          <a class="btn btn-secondary" href="/contact/">Contact Me</a>
+        </div>
+      </div>
+
+      <div class="hero-side">
+        <div class="card avatar">
+          <img src="/avatar.svg" alt="Avatar placeholder for Arpit Garg" />
+        </div>
+        <div class="card">
+          <h3>Quick Intro</h3>
+          <p>6+ years in iOS development, focused on video systems, camera capture, architecture, debugging, and performance work.</p>
+          <div class="meta-row">
+            <span class="pill">Delhi / India</span>
+            <span class="pill">Swift First</span>
+            <span class="pill">Germany Track</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="grid grid-2">
+      <div class="card">
+        <h2>About</h2>
+        <p>
+          I’m Arpit Garg, an iOS engineer who likes solving hard product problems in capture pipelines, synchronization,
+          app architecture, and production-quality debugging. I’m also building in public through technical writing and small browser games.
+        </p>
+        <div class="pill-row">
+          {skills.map((skill) => <span class="pill">{skill}</span>)}
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Career Story</h2>
+        <p>
+          My current focus is simple: show strong engineering work publicly, write practical notes for other developers,
+          and present a clean portfolio for international opportunities, especially Germany.
+        </p>
+        <p class="small">Replace GitHub and LinkedIn links in the code before going live.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Featured Writing</h2>
+    <div class="grid grid-3 post-list">
+      {posts.map((post) => (
+        <a href={`/blog/${post.slug}/`}>
+          <h3>{post.data.title}</h3>
+          <p>{post.data.description}</p>
+          <p class="small mono">{post.data.pubDate.toISOString().slice(0, 10)}</p>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>What you’ll find here</h2>
+    <div class="grid grid-3">
+      <div class="mini-card">
+        <h3>Projects</h3>
+        <p>Portfolio-ready case studies for camera, video, thermal handling, and architecture-heavy app work.</p>
+      </div>
+      <div class="mini-card">
+        <h3>Blog</h3>
+        <p>Markdown-based posts you can edit locally and publish with one `git push`.</p>
+      </div>
+      <div class="mini-card">
+        <h3>Games</h3>
+        <p>Small browser experiments that make the site feel personal instead of generic.</p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

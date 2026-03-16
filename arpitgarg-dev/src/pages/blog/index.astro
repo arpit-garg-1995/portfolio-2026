@@ -1,0 +1,36 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('blog'))
+  .filter((post) => !post.data.draft)
+  .sort((a, b) => b.data.pubDate - a.data.pubDate);
+---
+
+<BaseLayout
+  title="Blog | Arpit Garg"
+  description="Technical writing by Arpit Garg on iOS, Swift, performance, interviews, and relocation."
+  path="/blog/"
+>
+  <section class="section">
+    <div class="card">
+      <h1>Blog</h1>
+      <p>Write in Markdown, commit, push, and the site updates automatically.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="grid post-list">
+      {posts.map((post) => (
+        <a href={`/blog/${post.slug}/`}>
+          <h2>{post.data.title}</h2>
+          <p>{post.data.description}</p>
+          <div class="pill-row">
+            {post.data.tags.map((tag) => <span class="pill">{tag}</span>)}
+          </div>
+          <p class="small mono" style="margin-top:1rem;">{post.data.pubDate.toDateString()}</p>
+        </a>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

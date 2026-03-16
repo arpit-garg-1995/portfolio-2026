@@ -1,0 +1,26 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import GameTicTacToe from '../components/GameTicTacToe.jsx';
+import ReactionDash from '../components/ReactionDash.astro';
+---
+
+<BaseLayout
+  title="Games | Arpit Garg"
+  description="Small browser games by Arpit Garg, built client-side with no backend."
+  path="/games/"
+>
+  <section class="section">
+    <div class="card">
+      <h1>Games</h1>
+      <p>Pure client-side, responsive, and fast. No server, no database, no tracking.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <GameTicTacToe client:load />
+  </section>
+
+  <section class="section">
+    <ReactionDash />
+  </section>
+</BaseLayout>

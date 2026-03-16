@@ -1,0 +1,33 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post }
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+---
+
+<BaseLayout
+  title={`${post.data.title} | Arpit Garg`}
+  description={post.data.description}
+  path={`/blog/${post.slug}/`}
+>
+  <section class="section">
+    <article class="card">
+      <p class="small mono">{post.data.pubDate.toDateString()}</p>
+      <h1>{post.data.title}</h1>
+      <p>{post.data.description}</p>
+      <div class="pill-row" style="margin-bottom:1rem;">
+        {post.data.tags.map((tag) => <span class="pill">{tag}</span>)}
+      </div>
+      <Content />
+    </article>
+  </section>
+</BaseLayout>
