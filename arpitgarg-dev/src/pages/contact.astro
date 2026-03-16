@@ -20,11 +20,18 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       </div>
 
       <div class="card">
-        <form name="contact" method="POST" data-netlify="true" netlify-honeypot="bot-field">
-          <input type="hidden" name="form-name" value="contact" />
-          <p hidden>
-            <label>Don’t fill this out <input name="bot-field" /></label>
-          </p>
+        <!-- Web3Forms: free, no backend, works on Cloudflare Pages -->
+        <form
+          action="https://api.web3forms.com/submit"
+          method="POST"
+          id="contact-form"
+        >
+          <!-- Replace YOUR_ACCESS_KEY with the key from web3forms.com -->
+          <input type="hidden" name="access_key" value="YOUR_ACCESS_KEY" />
+          <!-- Optional: redirect after submission -->
+          <input type="hidden" name="redirect" value="https://arpitgarg.pages.dev/contact/?sent=true" />
+          <!-- Honeypot for spam prevention -->
+          <input type="checkbox" name="botcheck" style="display:none" />
 
           <label>
             <span class="small">Name</span>
@@ -43,7 +50,19 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
           <button class="btn btn-primary" type="submit">Send Message</button>
         </form>
+
+        <!-- Thank-you message shown after redirect back with ?sent=true -->
+        <div id="form-success" style="display:none;" class="pill">
+          Message sent! I'll reply within 48 hours.
+        </div>
       </div>
     </div>
   </section>
+
+  <script is:inline>
+    if (new URLSearchParams(window.location.search).get('sent') === 'true') {
+      document.getElementById('contact-form').style.display = 'none';
+      document.getElementById('form-success').style.display = 'block';
+    }
+  </script>
 </BaseLayout>
