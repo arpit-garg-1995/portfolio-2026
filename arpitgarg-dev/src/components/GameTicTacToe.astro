@@ -1,0 +1,207 @@
+---
+// No server-side props needed – all logic is client-side vanilla JS
+---
+
+<section class="card" id="ttt-section">
+  <div class="game-header">
+    <div>
+      <h2>Twin Tic-Tac-Toe</h2>
+      <p class="game-note">Left: you (X) vs minimax bot (O). Right: minimax X vs random O, advancing alongside your moves.</p>
+    </div>
+    <div class="game-actions">
+      <span class="pill mono" id="ttt-stats">W 0 · L 0 · D 0</span>
+      <button class="btn btn-secondary" id="ttt-reset" type="button">Reset</button>
+    </div>
+  </div>
+
+  <div class="boards">
+    <!-- Player board -->
+    <div class="mini-card">
+      <h3>Your Board</h3>
+      <p class="game-note" id="ttt-status">You are X. Beat the bot.</p>
+      <div class="board" id="ttt-player-board" role="grid" aria-label="Your tic tac toe board">
+        <button class="cell" type="button" data-idx="0"></button>
+        <button class="cell" type="button" data-idx="1"></button>
+        <button class="cell" type="button" data-idx="2"></button>
+        <button class="cell" type="button" data-idx="3"></button>
+        <button class="cell" type="button" data-idx="4"></button>
+        <button class="cell" type="button" data-idx="5"></button>
+        <button class="cell" type="button" data-idx="6"></button>
+        <button class="cell" type="button" data-idx="7"></button>
+        <button class="cell" type="button" data-idx="8"></button>
+      </div>
+    </div>
+
+    <!-- Coach board -->
+    <div class="mini-card">
+      <h3>Coach Board</h3>
+      <p class="game-note" id="ttt-coach-status">Minimax X plays the strongest move each turn.</p>
+      <div class="board" id="ttt-coach-board" role="grid" aria-label="Coach tic tac toe board">
+        <button class="cell" type="button" disabled data-idx="0"></button>
+        <button class="cell" type="button" disabled data-idx="1"></button>
+        <button class="cell" type="button" disabled data-idx="2"></button>
+        <button class="cell" type="button" disabled data-idx="3"></button>
+        <button class="cell" type="button" disabled data-idx="4"></button>
+        <button class="cell" type="button" disabled data-idx="5"></button>
+        <button class="cell" type="button" disabled data-idx="6"></button>
+        <button class="cell" type="button" disabled data-idx="7"></button>
+        <button class="cell" type="button" disabled data-idx="8"></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script is:inline>
+  (function () {
+    const LINES = [
+      [0,1,2],[3,4,5],[6,7,8],
+      [0,3,6],[1,4,7],[2,5,8],
+      [0,4,8],[2,4,6]
+    ];
+    const KEY = 'ag-ttt-stats';
+
+    function empty() { return Array(9).fill(''); }
+
+    function winner(board) {
+      for (const [a,b,c] of LINES) {
+        if (board[a] && board[a] === board[b] && board[a] === board[c]) return board[a];
+      }
+      return board.every(Boolean) ? 'draw' : null;
+    }
+
+    function moves(board) {
+      return board.map((v,i) => v ? null : i).filter(v => v !== null);
+    }
+
+    function minimax(board, isMax, ai, human) {
+      const r = winner(board);
+      if (r === ai) return { score: 10 };
+      if (r === human) return { score: -10 };
+      if (r === 'draw') return { score: 0 };
+
+      if (isMax) {
+        let best = { score: -Infinity, index: -1 };
+        for (const idx of moves(board)) {
+          const next = [...board]; next[idx] = ai;
+          const s = minimax(next, false, ai, human).score;
+          if (s > best.score) best = { score: s, index: idx };
+        }
+        return best;
+      }
+
+      let best = { score: Infinity, index: -1 };
+      for (const idx of moves(board)) {
+        const next = [...board]; next[idx] = human;
+        const s = minimax(next, true, ai, human).score;
+        if (s < best.score) best = { score: s, index: idx };
+      }
+      return best;
+    }
+
+    function randomMove(board) {
+      const opts = moves(board);
+      return opts[Math.floor(Math.random() * opts.length)];
+    }
+
+    // --- State ---
+    let playerBoard = empty();
+    let coachBoard  = empty();
+    let stats = JSON.parse(localStorage.getItem(KEY) || '{"wins":0,"losses":0,"draws":0}');
+
+    // --- DOM refs ---
+    const statusEl      = document.getElementById('ttt-status');
+    const coachStatusEl = document.getElementById('ttt-coach-status');
+    const statsEl       = document.getElementById('ttt-stats');
+    const playerCells   = [...document.querySelectorAll('#ttt-player-board .cell')];
+    const coachCells    = [...document.querySelectorAll('#ttt-coach-board .cell')];
+
+    function saveStats() {
+      localStorage.setItem(KEY, JSON.stringify(stats));
+      statsEl.textContent = `W ${stats.wins} · L ${stats.losses} · D ${stats.draws}`;
+    }
+
+    function renderBoard(cells, board) {
+      cells.forEach((cell, i) => { cell.textContent = board[i]; });
+    }
+
+    function setPlayerDisabled(disabled) {
+      playerCells.forEach(c => { c.disabled = disabled || !!c.textContent; });
+    }
+
+    function finishPlayer(result) {
+      if (result === 'X') {
+        statusEl.textContent = 'You win! Nice line.';
+        stats.wins++;
+      } else if (result === 'O') {
+        statusEl.textContent = 'Bot wins. Try opening with a corner next time.';
+        stats.losses++;
+      } else {
+        statusEl.textContent = 'Draw. Perfect play does that.';
+        stats.draws++;
+      }
+      setPlayerDisabled(true);
+      saveStats();
+    }
+
+    function advanceCoach() {
+      if (winner(coachBoard)) return;
+
+      const xIdx = minimax(coachBoard, true, 'X', 'O').index;
+      if (xIdx > -1) coachBoard[xIdx] = 'X';
+      if (winner(coachBoard)) {
+        const r = winner(coachBoard);
+        coachStatusEl.textContent = r === 'draw' ? 'Coach board: draw.' : `Coach board winner: ${r}`;
+        renderBoard(coachCells, coachBoard);
+        return;
+      }
+
+      const oIdx = randomMove(coachBoard);
+      if (oIdx !== undefined) coachBoard[oIdx] = 'O';
+      const r = winner(coachBoard);
+      coachStatusEl.textContent = r
+        ? (r === 'draw' ? 'Coach board: draw.' : `Coach board winner: ${r}`)
+        : 'Minimax X played the strongest move.';
+      renderBoard(coachCells, coachBoard);
+    }
+
+    function handlePlayerClick(idx) {
+      if (playerBoard[idx] || winner(playerBoard)) return;
+
+      playerBoard[idx] = 'X';
+      renderBoard(playerCells, playerBoard);
+      advanceCoach();
+
+      const afterPlayer = winner(playerBoard);
+      if (afterPlayer) { finishPlayer(afterPlayer); return; }
+
+      const aiIdx = minimax(playerBoard, true, 'O', 'X').index;
+      if (aiIdx > -1) { playerBoard[aiIdx] = 'O'; }
+      renderBoard(playerCells, playerBoard);
+
+      const afterAI = winner(playerBoard);
+      if (afterAI) { finishPlayer(afterAI); return; }
+
+      statusEl.textContent = 'Your move. Watch the coach board for the optimal path.';
+      setPlayerDisabled(false);
+    }
+
+    function reset() {
+      playerBoard = empty();
+      coachBoard  = empty();
+      renderBoard(playerCells, playerBoard);
+      renderBoard(coachCells, coachBoard);
+      statusEl.textContent      = 'You are X. Beat the bot.';
+      coachStatusEl.textContent = 'Minimax X plays the strongest move each turn.';
+      setPlayerDisabled(false);
+    }
+
+    // --- Event listeners ---
+    playerCells.forEach(cell => {
+      cell.addEventListener('click', () => handlePlayerClick(Number(cell.dataset.idx)));
+    });
+    document.getElementById('ttt-reset').addEventListener('click', reset);
+
+    // init
+    saveStats();
+  })();
+</script>

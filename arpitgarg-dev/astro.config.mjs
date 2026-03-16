@@ -1,11 +1,10 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
-import preact from '@astrojs/preact';
 
 export default defineConfig({
-  site: 'https://arpitgarg.dev',   // ← change to https://arpitgarg.com once domain is live
+  site: 'https://arpitgarg.pages.dev',
   output: 'static',
-  integrations: [preact(), sitemap()],
+  integrations: [sitemap()],
   markdown: {
     shikiConfig: {
       theme: 'github-dark'

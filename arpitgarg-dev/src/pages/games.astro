@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import GameTicTacToe from '../components/GameTicTacToe.jsx';
+import GameTicTacToe from '../components/GameTicTacToe.astro';   // ← .astro now
 import ReactionDash from '../components/ReactionDash.astro';
 ---
 
@@ -17,7 +17,7 @@ import ReactionDash from '../components/ReactionDash.astro';
   </section>
 
   <section class="section">
-    <GameTicTacToe client:load />
+    <GameTicTacToe />
   </section>
 
   <section class="section">
