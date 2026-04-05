@@ -3,7 +3,7 @@ title: "Preparing for Germany as an Indian iOS Developer"
 description: "How I think about portfolio quality, communication, and public proof of work while planning relocation."
 pubDate: 2026-03-05
 tags: ["Career", "Germany", "Portfolio"]
-draft: false
+draft: true
 ---
 
 A relocation portfolio has to do one thing well: reduce doubt.
